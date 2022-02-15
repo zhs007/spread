@@ -10,9 +10,13 @@ import (
 
 func main() {
 	cfgSpread := &spreadcore.SpreadConfig{
-		SpreadingRate: 5,
-		RetentionRate: 600,
+		SpreadingRate:    5,
+		MapRetentionRate: make(map[int]int),
 	}
+
+	cfgSpread.MapRetentionRate[1] = 4000
+	cfgSpread.MapRetentionRate[30] = 1000
+	cfgSpread.MapRetentionRate[99] = 1000
 
 	cfgMarket := &spreadcore.MarketConfig{
 		TotalNums: 100000000,
@@ -26,9 +30,10 @@ func main() {
 		return
 	}
 
-	day := 0
-	for !market.OnDay(10000) {
-		fmt.Printf("%v day: none-%v users-%v\n", day, market.MapPersonNums["none"], market.MapPersonNums["user"])
+	day := 1
+	for !market.OnDay(day, 10000) {
+		t, cu := market.CountUsers(day)
+		fmt.Printf("%v day: none-%v users-%v lastusers-%v\n", day, market.MapPersonNums["none"], float32(t)/100000000.0, float32(cu)/100000000.0)
 
 		day++
 	}
